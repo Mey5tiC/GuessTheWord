@@ -10,8 +10,6 @@ import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 public class ClientHandler implements Runnable{
@@ -62,7 +60,6 @@ public class ClientHandler implements Runnable{
     }
     
     private void forwardToClient(String received){
-        // username # message
         StringTokenizer tokenizer = new StringTokenizer(received, "#");
         String recipient = tokenizer.nextToken().trim();
         String message = tokenizer.nextToken().trim();

@@ -4,12 +4,13 @@
  */
 package guesstheword;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 /**
  *
@@ -18,26 +19,20 @@ import java.util.List;
 public class IndovinaParola {
 
     String parola;
-    static List<String> parole;
     
     public IndovinaParola() {
-        //aggiungo tutte le parole all'array
-        parole=new ArrayList<>();
         
-        String path = new File("src/main/resources/conf.properties").getAbsolutePath();System.out.println(path);
-        try {
-            List<String> allLines = Files.readAllLines(Paths.get("./words.txt"));
-            for (String line : allLines) {
-                parole.add(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-	}
+        String filename="words.txt";
+        Path pathToFile = Paths.get(filename);
+        System.out.println(pathToFile.toAbsolutePath());
         
+        try (Stream<String> lines = Files.lines(pathToFile.toAbsolutePath())) {
+            parola = lines.skip(Util.Random(0, lines.toArray().length)-1).findFirst().get();
+        } catch (IOException ex) {
+            Logger.getLogger(IndovinaParola.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
-        parola=parole.get(Util.Random(0, parole.size()));
-        
-        System.out.println("parola");
+        System.out.println(parola);
     }
     
     public String stampaIndovina(String tmp, String attuale){
