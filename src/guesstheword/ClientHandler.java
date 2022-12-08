@@ -18,11 +18,13 @@ public class ClientHandler implements Runnable{
     final Scanner scan;
     String name;
     boolean isLosggedIn;
+    IndovinaParola indovina;
+    String attuale;
     
     private DataInputStream input;
     private DataOutputStream output;
     
-    public ClientHandler(Socket socket, String name){
+    public ClientHandler(Socket socket, String name, IndovinaParola indovina){
         this.socket = socket;
         scan = new Scanner(System.in);
         this.name = name;
@@ -35,12 +37,18 @@ public class ClientHandler implements Runnable{
         }catch(IOException ex){
             log("ClientHander : " + ex.getMessage());
         }
+        
+        this.indovina=indovina;
+        attuale="";
+        for (int i = 0; i < indovina.getParola().length(); i++) {
+            attuale+="*";
+        }
     }
     @Override
     public void run() {
         String received;
         String tmp="";
-        write(output, "Your name : " + name);
+        write(output, "Your name : " + name + "Parola da indovinare:" + indovina.getParola());
         for(ClientHandler c : Server.getClients()){
            tmp+=c.name+", ";
         }
@@ -54,21 +62,23 @@ public class ClientHandler implements Runnable{
                 break;
             }
             
-            forwardToClient(received);
+            forwardToClients(received);
         }
         closeStreams();
     }
     
-    private void forwardToClient(String received){
-        StringTokenizer tokenizer = new StringTokenizer(received, "#");
+    private void forwardToClients(String received){
+        /*StringTokenizer tokenizer = new StringTokenizer(received, "#");
         String recipient = tokenizer.nextToken().trim();
-        String message = tokenizer.nextToken().trim();
-        
+        String message = tokenizer.nextToken().trim();*/
+        attuale = indovina.stampaIndovina(received, attuale);
+        if(!attuale.contains("*")){
+            System.out.println(indovina.vittoria());
+        }
         for(ClientHandler c : Server.getClients()){
-            if(c.isLosggedIn && c.name.equals(recipient)){
-                write(c.output,  recipient + " : " + message);
-                log(name + " --> " + recipient + " : " + message);
-                break;
+            if(c.isLosggedIn){
+                write(c.output, attuale);
+                log(received);
             }
         }
         

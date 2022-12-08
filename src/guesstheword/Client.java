@@ -78,12 +78,12 @@ public class Client {
     }
     
     private void log(String msg){
-        if(!msg.contains("Your name :")&&!msg.contains("Active clients:")){
-            Date now = new Date();
-            System.out.println(now.toString()+"-"+msg);
-        }
-        else{   
-            System.out.println(msg);
-        }
+        //if(!msg.contains("Your name :")&&!msg.contains("Active clients:")){
+            //Date now = new Date();
+            //System.out.println(now.toString()+"-"+msg);
+        //}
+        //else{   
+            System.out.println("log:"+msg);
+        //}
     }
 }
