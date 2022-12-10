@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package guesstheword;
 
 import java.io.BufferedReader;
@@ -12,10 +8,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
-/**
- *
- * @author fumagalli_andrea04
- */
 public class IndovinaParola {
 
     String parola;
@@ -24,13 +16,14 @@ public class IndovinaParola {
         
         String filename="words.txt";
         String pathToFile=Paths.get(filename).toAbsolutePath().toString();
-        //System.out.println(pathToFile.toAbsolutePath());
         BufferedReader br;
         try {
+            System.out.println("try");
             br = new BufferedReader(new FileReader(pathToFile));
             Stream<String> lines = br.lines();
             parola = lines.skip(Util.Random(0, 661563)).findFirst().get();
         } catch (FileNotFoundException ex) {
+            System.out.println("catch");
             Logger.getLogger(IndovinaParola.class.getName()).log(Level.SEVERE, null, ex);
             parola="errore";
         }
@@ -70,6 +63,4 @@ public class IndovinaParola {
     public String vittoria(){
         return "Hai indovinato la parola";
     }
-    
-    
 }

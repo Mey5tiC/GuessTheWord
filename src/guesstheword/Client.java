@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Date;
 import java.util.Scanner;
 
 public class Client {
@@ -77,13 +76,7 @@ public class Client {
         sendMessage.start();
     }
     
-    private void log(String msg){
-        //if(!msg.contains("Your name :")&&!msg.contains("Active clients:")){
-            //Date now = new Date();
-            //System.out.println(now.toString()+"-"+msg);
-        //}
-        //else{   
-            System.out.println("log:"+msg);
-        //}
+    private void log(String msg){ 
+        System.out.println("log:"+msg);
     }
 }

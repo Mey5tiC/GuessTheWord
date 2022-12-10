@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package guesstheword;
 
 import java.io.IOException;
@@ -18,10 +12,9 @@ public class Server {
     ServerSocket serverSocket;
     static int numOfUsers = 0;
     Socket socket;
-    IndovinaParola indovina;
+    static IndovinaParola indovina;
     
     public Server(){
-        indovina=new IndovinaParola();
         clients = new ArrayList<>();
         try{
             serverSocket = new ServerSocket(Constants.PORT);
@@ -48,14 +41,13 @@ public class Server {
             log("Client accepted : " + socket.getInetAddress());
             numOfUsers++;
             
-            ClientHandler handler = new ClientHandler(socket, "user" + numOfUsers, indovina);
+            ClientHandler handler = new ClientHandler(socket, "user" + numOfUsers);
             
             Thread thread = new Thread(handler);
             addClient(handler);
             thread.start();
         }
     }
-    
     
     public  static List<ClientHandler> getClients(){
         return clients;
@@ -66,5 +58,10 @@ public class Server {
     }
     private void log(String message) {
         System.out.println(message);
+    }
+    
+    public static IndovinaParola gameStart(){
+        indovina=new IndovinaParola();
+        return indovina;
     }
 }
