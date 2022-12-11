@@ -29,18 +29,13 @@ public class ClientHandler implements Runnable {
         } catch (IOException ex) {
             log("ClientHander : " + ex.getMessage());
         }
-
-        attuale = "";
-        for (int i = 0; i < indovina.getParola().length(); i++) {
-            attuale += "*";
-        }
     }
 
     @Override
     public void run() {
         String received;
         String tmp = "";
-        write(output, "Your name : " + name + "; Parola da indovinare:" + indovina.getParola());
+        write(output, "Your name : " + name);
         for (ClientHandler c : Server.getClients()) {
             tmp += c.name + ", ";
         }
@@ -79,6 +74,7 @@ public class ClientHandler implements Runnable {
                     if (c.isLosggedIn) {
                         if (!attuale.contains("*")) {
                             write(c.output, indovina.vittoria());
+                            write(c.output, indovina.getParola());
                             endGame();
                         } else {
                             write(c.output, attuale);
@@ -92,6 +88,7 @@ public class ClientHandler implements Runnable {
                     for (ClientHandler c : Server.getClients()) {
                         if (c.isLosggedIn) {
                             write(c.output, "Gioco iniziato");
+                            write(c.output, attuale);
                             log(received);
                         }
                     }
@@ -144,6 +141,10 @@ public class ClientHandler implements Runnable {
     private void gameStart() {
         indovina = Server.gameStart();
         playing = true;
+        attuale = "";
+        for (int i = 0; i < indovina.getParola().length(); i++) {
+            attuale += "*";
+        }
     }
 
     public void endGame() {
