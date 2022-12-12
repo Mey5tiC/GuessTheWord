@@ -13,6 +13,7 @@ public class Server {
     static int numOfUsers = 0;
     Socket socket;
     static IndovinaParola indovina;
+    Frame frame;
     
     public Server(){
         clients = new ArrayList<>();
@@ -21,6 +22,7 @@ public class Server {
         }catch(IOException ex){
             log("Server : " + ex.getMessage());
         }
+        frame=new Frame("Server");
     }
     
     public static void main(String[] args){
@@ -41,7 +43,7 @@ public class Server {
             log("Client accepted : " + socket.getInetAddress());
             numOfUsers++;
             
-            ClientHandler handler = new ClientHandler(socket, "user" + numOfUsers);
+            ClientHandler handler = new ClientHandler(socket, "user" + numOfUsers,frame);
             
             Thread thread = new Thread(handler);
             addClient(handler);
@@ -58,6 +60,7 @@ public class Server {
     }
     private void log(String message) {
         System.out.println(message);
+        frame.log(message);
     }
     
     public static IndovinaParola gameStart(){

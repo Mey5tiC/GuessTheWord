@@ -50,6 +50,7 @@ public class Client {
                         log(msg);
                     }catch(IOException ex){
                         log("readMessageThread : " + ex.getMessage());
+                        break;
                     }
                     
                 }
@@ -69,6 +70,7 @@ public class Client {
                         output.writeUTF(msg);
                     }catch(IOException ex){
                         log("writeMessageThread : " + ex.getMessage());
+                        break;
                     }
                 }
             }
@@ -77,6 +79,6 @@ public class Client {
     }
     
     private void log(String msg){ 
-        System.out.println("log:"+msg);
+        System.out.println(msg);
     }
 }

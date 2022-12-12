@@ -25,14 +25,11 @@ public class IndovinaParola {
         String pathToFile = Paths.get(filename).toAbsolutePath().toString();
         BufferedReader br;
         try {
-            System.out.println("try");
             br = new BufferedReader(new FileReader(pathToFile));
             Stream<String> lines = br.lines();
             parola = lines.skip(Util.Random(0, 661563)).findFirst().get();
         } catch (FileNotFoundException ex) {
-            System.out.println("catch");
             Logger.getLogger(IndovinaParola.class.getName()).log(Level.SEVERE, null, ex);
-            parola = "errore";
         }
 
         System.out.println(parola);

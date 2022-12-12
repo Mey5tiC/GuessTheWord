@@ -12,15 +12,18 @@ public class ClientHandler implements Runnable {
     IndovinaParola indovina;
     String attuale;
     boolean playing;
+    Frame serverFrame;
+    Frame userFrame;
 
     private DataInputStream input;
     private DataOutputStream output;
 
-    public ClientHandler(Socket socket, String name) {
+    public ClientHandler(Socket socket, String name,Frame serverFrame) {         
         playing = false;
         this.socket = socket;
         this.name = name;
         isLosggedIn = true;
+        this.serverFrame=serverFrame;
 
         try {
             input = new DataInputStream(socket.getInputStream());
@@ -29,6 +32,8 @@ public class ClientHandler implements Runnable {
         } catch (IOException ex) {
             log("ClientHander : " + ex.getMessage());
         }
+        
+        userFrame=new Frame(name,output);
     }
 
     @Override
@@ -62,7 +67,7 @@ public class ClientHandler implements Runnable {
 
             for (ClientHandler c : Server.getClients()) {
                 if (c.isLosggedIn && c.name.equals(recipient)) {
-                    write(c.output, recipient + " : " + message);
+                    userFrame.log(recipient + " : " + message);
                     log(name + " --> " + recipient + " : " + message);
                     break;
                 }
@@ -73,8 +78,8 @@ public class ClientHandler implements Runnable {
                 for (ClientHandler c : Server.getClients()) {
                     if (c.isLosggedIn) {
                         if (!attuale.contains("*")) {
-                            write(c.output, indovina.vittoria());
-                            write(c.output, indovina.getParola());
+                            userFrame.log(indovina.vittoria());
+                            userFrame.log(indovina.getParola());
                             endGame();
                         } else {
                             write(c.output, attuale);
@@ -87,24 +92,26 @@ public class ClientHandler implements Runnable {
                     gameStart();
                     for (ClientHandler c : Server.getClients()) {
                         if (c.isLosggedIn) {
-                            write(c.output, "Gioco iniziato");
-                            write(c.output, attuale);
+                            userFrame.log("Gioco iniziato");
+                            userFrame.log(attuale);
                             log(received);
                         }
                     }
                 }
             }
-
+ 
         }
-
+        
     }
 
     private String read() {
         String line = "";
         try {
             line = input.readUTF();
+            userFrame.log(line);
         } catch (IOException ex) {
             log("read : " + ex.getMessage());
+            return null;
         }
         return line;
     }
@@ -112,6 +119,7 @@ public class ClientHandler implements Runnable {
     private void write(DataOutputStream output, String message) {
         try {
             output.writeUTF(message);
+            userFrame.log(message);
         } catch (IOException ex) {
             log("write : " + ex.getMessage());
         }
@@ -136,6 +144,7 @@ public class ClientHandler implements Runnable {
 
     private void log(String msg) {
         System.out.println(msg);
+        serverFrame.log(msg);
     }
 
     private void gameStart() {
