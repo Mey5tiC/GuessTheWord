@@ -16,6 +16,7 @@ import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.text.DefaultCaret;
 
 public class Frame extends JFrame implements ActionListener {
 
@@ -24,7 +25,7 @@ public class Frame extends JFrame implements ActionListener {
     JTextArea systemLog;
     JScrollPane scroll;
 
-    JTextArea userWrite = new JTextArea(100, 50);
+    JTextArea userWrite = new JTextArea(1,20);
     JLabel image = new JLabel(new ImageIcon("../imgs/corda.png"));
     JScrollPane scrollChat;
     JButton invia = new JButton("Invia");
@@ -33,7 +34,7 @@ public class Frame extends JFrame implements ActionListener {
     Frame(String caller) {
 
         panel.setBorder(new TitledBorder(new EtchedBorder(), caller));
-        systemLog = new JTextArea(100, 100);
+        systemLog = new JTextArea(50,50);
         systemLog.setBounds(0, 0, 800, 800);
         systemLog.setEditable(false);
         scroll = new JScrollPane(systemLog);
@@ -42,34 +43,41 @@ public class Frame extends JFrame implements ActionListener {
         panel.setSize(800, 800);
         frame.add(panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
+        frame.setSize(800, 800);
         frame.setLocationRelativeTo(null);
         frame.setLayout(null);
+        frame.setResizable(false);
         frame.setVisible(true);
 
     }
 
     Frame(String caller, DataOutputStream output) {
-
+        
+        
+        image.setSize(400,600);
         this.output=output;
         panel.setBorder(new TitledBorder(new EtchedBorder(), caller));
-        systemLog = new JTextArea(100, 50);
-        systemLog.setBounds(400, 0, 800, 800);
+        systemLog = new JTextArea(30,20);
+        DefaultCaret caret = (DefaultCaret)systemLog.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.OUT_BOTTOM);
+        systemLog.setBounds(400, 0, 200, 200);
         systemLog.setEditable(false);
         scrollChat = new JScrollPane(systemLog);
         scrollChat.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        panel.add(image);
         panel.add(scrollChat);
         panel.add(userWrite);
-        invia.setBounds(100, 160, 200, 40);
+        invia.setBounds(700, 700, 100, 100);
         invia.setFocusable(false);
         invia.addActionListener(this);
         panel.add(invia);
         panel.setSize(800, 800);
         frame.add(panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
+        frame.setSize(800, 800);
         frame.setLocationRelativeTo(null);
         frame.setLayout(null);
+        frame.setResizable(false);
         frame.setVisible(true);
         
     }
@@ -86,6 +94,10 @@ public class Frame extends JFrame implements ActionListener {
         } catch (IOException ex) {
             Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public void aggiungiErrore(){
+        
     }
 
 }

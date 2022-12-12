@@ -15,6 +15,7 @@ public class Client {
     DataInputStream input = null;
     DataOutputStream output = null;
     InetAddress ip;
+    Frame userFrame;
     
     public Client(){
         try{
@@ -30,7 +31,7 @@ public class Client {
         }catch(IOException ex){
             log("Client : " + ex.getMessage());
         }
-        
+         userFrame = new Frame("client",output);
     }
     
     public static void main(String[] args){
@@ -79,6 +80,6 @@ public class Client {
     }
     
     private void log(String msg){ 
-        System.out.println(msg);
+        userFrame.log(msg);
     }
 }

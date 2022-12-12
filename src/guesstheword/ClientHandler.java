@@ -2,6 +2,7 @@ package guesstheword;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Scanner;
 import java.util.StringTokenizer;
 
 public class ClientHandler implements Runnable {
@@ -13,17 +14,16 @@ public class ClientHandler implements Runnable {
     String attuale;
     boolean playing;
     Frame serverFrame;
-    Frame userFrame;
 
     private DataInputStream input;
     private DataOutputStream output;
 
-    public ClientHandler(Socket socket, String name,Frame serverFrame) {         
+    public ClientHandler(Socket socket, String name, Frame serverFrame) {
         playing = false;
         this.socket = socket;
         this.name = name;
         isLosggedIn = true;
-        this.serverFrame=serverFrame;
+        this.serverFrame = serverFrame;
 
         try {
             input = new DataInputStream(socket.getInputStream());
@@ -32,8 +32,7 @@ public class ClientHandler implements Runnable {
         } catch (IOException ex) {
             log("ClientHander : " + ex.getMessage());
         }
-        
-        userFrame=new Frame(name,output);
+
     }
 
     @Override
@@ -67,48 +66,48 @@ public class ClientHandler implements Runnable {
 
             for (ClientHandler c : Server.getClients()) {
                 if (c.isLosggedIn && c.name.equals(recipient)) {
-                    userFrame.log(recipient + " : " + message);
+                    write(c.output, recipient + " : " + message);
                     log(name + " --> " + recipient + " : " + message);
                     break;
                 }
             }
         } else {
             if (playing) {
-                attuale = indovina.stampaIndovina(received, attuale);
                 for (ClientHandler c : Server.getClients()) {
-                    if (c.isLosggedIn) {
+                    if (c.isLosggedIn && c.name.equals(name)) {
+                        attuale = indovina.stampaIndovina(received, attuale, this, c.output);
                         if (!attuale.contains("*")) {
-                            userFrame.log(indovina.vittoria());
-                            userFrame.log(indovina.getParola());
-                            endGame();
+                            write(c.output, indovina.vittoria());
+                            write(c.output, indovina.getParola());
+                            endGame(c);
                         } else {
                             write(c.output, attuale);
                         }
-                        log(received);
+                        log(c.name + ":" + received);
                     }
                 }
             } else {
                 if (received.equalsIgnoreCase("start")) {
                     gameStart();
                     for (ClientHandler c : Server.getClients()) {
-                        if (c.isLosggedIn) {
-                            userFrame.log("Gioco iniziato");
-                            userFrame.log(attuale);
-                            log(received);
+                        if (c.isLosggedIn && c.name.equals(name)) {
+                            write(c.output, "Gioco iniziato");
+                            write(c.output, attuale);
+                            log(c.name + ":" + received);
                         }
                     }
                 }
             }
- 
+
         }
-        
+
     }
 
     private String read() {
         String line = "";
         try {
             line = input.readUTF();
-            userFrame.log(line);
+
         } catch (IOException ex) {
             log("read : " + ex.getMessage());
             return null;
@@ -116,10 +115,10 @@ public class ClientHandler implements Runnable {
         return line;
     }
 
-    private void write(DataOutputStream output, String message) {
+    public void write(DataOutputStream output, String message) {
         try {
             output.writeUTF(message);
-            userFrame.log(message);
+
         } catch (IOException ex) {
             log("write : " + ex.getMessage());
         }
@@ -143,7 +142,6 @@ public class ClientHandler implements Runnable {
     }
 
     private void log(String msg) {
-        System.out.println(msg);
         serverFrame.log(msg);
     }
 
@@ -156,7 +154,76 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    public void endGame() {
+    public void endGame(ClientHandler c) {
         playing = false;
+
+        int actualScore = indovina.tentativi;
+
+        String[] scores = new String[10];
+
+        for (int i = 0; i < scores.length; i++) {
+            scores[i] = "";
+        }
+
+        int x = 0;
+        try {
+            File readFile = new File("Scoreboard.csv");
+            Scanner scan = new Scanner(readFile);
+            while (scan.hasNextLine()) {
+                String data = scan.nextLine();
+                scores[x] = data;
+                x++;
+            }
+            scan.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+        if (scores[scores.length - 1].equals("")) {
+            scores[x] = c.name + ";" + actualScore + ";\n";
+        } else {
+            int[] tentativi = new int[10];
+
+            int index = -1;
+            for (int i = 0; i < tentativi.length; i++) {
+                tentativi[i] = Character.getNumericValue(scores[i].charAt(scores[i].length() - 2));
+                if (tentativi[i] > actualScore) {
+                    index = i;
+                    break;
+                }
+            }
+
+            if (index != -1) {
+                String[] tmpVett = new String[10];
+                int tmp = 0;
+                for (int i = index; i < scores.length; i++) {
+                    tmpVett[tmp]=scores[i];
+                    tmp++;
+                }
+                
+                scores[index]=c.name + ";" + actualScore + ";\n";
+                
+                tmp=0;
+                for (int i = index+1; i < scores.length; i++) {
+                    scores[i]=tmpVett[tmp];
+                    tmp++;
+                }
+            }
+
+        }
+        
+        String write = "";
+        
+        for (int i = 0; i < scores.length; i++) {
+            write+=scores[i];
+        }
+        
+        try {
+            FileWriter writeFile = new FileWriter("Scoreboard.csv", false);
+            writeFile.write(write);
+            writeFile.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

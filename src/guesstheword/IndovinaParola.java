@@ -1,6 +1,7 @@
 package guesstheword;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.nio.file.Paths;
@@ -16,6 +17,7 @@ public class IndovinaParola {
     List<String> inseriti;
     int errori;
     int status;
+    int tentativi;
 
     public IndovinaParola() {
         inseriti = new ArrayList<String>();
@@ -39,11 +41,11 @@ public class IndovinaParola {
         return parola;
     }
 
-    public String stampaIndovina(String inserita, String attuale) {
+    public String stampaIndovina(String inserita, String attuale, ClientHandler ch, DataOutputStream o) {
         if (inserita.length() == 1) {
             if (!inseriti.contains(inserita)) {
+                tentativi++;
                 inseriti.add(inserita);
-                System.out.println("carattere");
                 char carattere = inserita.charAt(0);
                 if (parola.contains(inserita)) {
                         for (int i = 0; i < parola.length(); i++) {
@@ -59,13 +61,15 @@ public class IndovinaParola {
                     }
                 }
             }else{
-                System.out.println("Lettera già inserita");
+                ch.write(o,"Lettera già inserita");
             }
         } else {
-            System.out.println("parola");
-            if (inserita.trim().equalsIgnoreCase(parola)) {
+            if(inserita.trim().equals("")){
+            }else if (inserita.trim().equalsIgnoreCase(parola)) {
+                tentativi++;
                 attuale = parola;
             }else{
+                tentativi++;
                 status++;
             }
         }
@@ -74,6 +78,6 @@ public class IndovinaParola {
     }
 
     public String vittoria() {
-        return "Hai indovinato la parola";
+        return "Hai indovinato la parola dopo "+tentativi+" mosse";
     }
 }
